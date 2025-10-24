@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinite Scroll Example</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #6e7ff3, #b8b3d2);
+            color: #333;
+            overflow-x: hidden;
+        }
+        #container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin: 15px;
+            padding: 20px;
+            width: 200px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+        h2 {
+            font-size: 18px;
+            margin: 0 0 10px;
+        }
+        p {
+            font-size: 14px;
+            color: #666;
+        }
+        #loading {
+            display: none;
+            text-align: center;
+            margin: 20px;
+            font-size: 18px;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+<div id="container"></div>
+<div id="loading">Loading more items...</div>
+
+<script>
+    const container = document.getElementById('container');
+    const loading = document.getElementById('loading');
+    let page = 0;
+
+    // Function to simulate fetching data
+    function fetchData() {
+        loading.style.display = 'block';
+        return new Promise(resolve => {
+            setTimeout(() => {
+                const items = [];
+                for (let i = 0; i < 10; i++) {
+                    items.push(`Item ${(page * 10) + i + 1}`);
+                }
+                resolve(items);
+            }, 1000); // Simulate network delay
+        });
+    }
+
+    // Function to render items
+    function renderItems(items) {
+        items.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `<h2>${item}</h2><p>Description for ${item}</p>`;
+            container.appendChild(card);
+        });
+    }
+
+    // Function to handle scrolling
+    async function handleScroll() {
+        if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
+            page++;
+            const items = await fetchData();
+            renderItems(items);
+            loading.style.display = 'none';
+        }
+    }
+
+    // Initial load
+    (async () => {
+        const items = await fetchData();
+        renderItems(items);
+    })();
+
+    window.addEventListener('scroll', handleScroll);
+</script>
+
+</body>
+</html>
